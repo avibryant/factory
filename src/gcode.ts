@@ -36,19 +36,19 @@ function spindle(on: boolean): GCode {
 function format(gc: GCode): string {
     const parts = []
     parts.push(gc.sym)
-    if (gc.x) {
+    if (gc.x != undefined) {
         parts.push("X")
         parts.push(gc.x)
     }
-    if (gc.y) {
+    if (gc.y != undefined) {
         parts.push("Y")
         parts.push(gc.y)
     }
-    if (gc.z) {
+    if (gc.z != undefined) {
         parts.push("Z")
         parts.push(gc.z)
     }
-    if (gc.r) {
+    if (gc.r != undefined) {
         parts.push("R")
         parts.push(gc.r)
     }
