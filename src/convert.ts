@@ -1,5 +1,6 @@
 import { parse } from './svgd.js'
 import { GCode, line, goTo, format } from './gcode'
+import { Point } from './point'
 
 type CommandName =
     "z" | "Z" | "h" | "H" | "v" | "V" |
@@ -9,11 +10,6 @@ type CommandName =
 interface Command {
     name: CommandName
     args: number[][]
-}
-
-interface Point {
-    x: number
-    y: number
 }
 
 class Interpreter {
