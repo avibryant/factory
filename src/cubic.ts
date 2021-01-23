@@ -60,12 +60,14 @@ function inflections(cu: Cubic): number[] {
 
     else {
         const det = y * y - 4 * x * z
-        const sq = Math.sqrt(det)
-        const d2 = 2 * x
+        if (det > 0) {
+            const sq = Math.sqrt(det)
+            const d2 = 2 * x
 
-        if (!nearZero(d2)) {
-            roots.push(-(y + sq) / d2)
-            roots.push((sq - y) / d2)
+            if (!nearZero(d2)) {
+                roots.push(-(y + sq) / d2)
+                roots.push((sq - y) / d2)
+            }
         }
     }
 
@@ -86,4 +88,9 @@ function split(c: Cubic, t: number): [Cubic, Cubic] {
     ]
 }
 
-export { cubic, split, inflections, Cubic }
+
+function splitAtInflections(c: Cubic): Cubic[] {
+    return [c]
+}
+
+export { cubic, split, inflections, splitAtInflections, Cubic }
