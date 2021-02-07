@@ -1,6 +1,8 @@
 import { parse } from './svgd.js'
-import { GCode, line, goTo, format } from './gcode'
-import { Point } from './point'
+import { GCode, line, goTo, format, arc } from './gcode'
+import { Point, distance } from './point'
+import { Arc, cubicArcs } from './arc'
+import { Cubic, cubic } from './cubic'
 
 type CommandName =
     "z" | "Z" | "h" | "H" | "v" | "V" |
@@ -84,8 +86,16 @@ class Interpreter {
         this.position = pt
     }
 
+    private arc(pt: Point, center: Point, cw: boolean) {
+        this.gcodes.push(arc(pt.x, pt.y, distance(pt, center), cw))
+        this.position = pt
+    }
+
     private cubic(pt: Point, c1: Point, c2: Point) {
-        this.line(pt)
+        const c = cubic(this.position, pt, c1, c2)
+        const arcs = cubicArcs(c, 1)
+        const cw = false //TODO
+        arcs.forEach(a => this.arc(a.p2, a.center, cw))
     }
 }
 

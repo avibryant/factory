@@ -1,19 +1,20 @@
 import { Cubic, split, splitAtInflections } from './cubic'
 import { Point } from './point'
-import { BiArc, cubicBiArc, maxDistance } from './biarc'
+import { cubicBiArc, maxDistance, centers } from './biarc'
 
 interface Arc {
     p1: Point
     p2: Point
-    r: number
+    center: Point
 }
 
 function findCubicArcs(c: Cubic, tolerance: number): Arc[] {
     const biArc = cubicBiArc(c)
     if (maxDistance(c, biArc) < tolerance) {
+        const cs = centers(biArc)
         return [
-            { p1: biArc.p1, p2: biArc.p2, r: biArc.r1 },
-            { p1: biArc.p2, p2: biArc.p3, r: biArc.r2 }
+            { p1: biArc.p1, p2: biArc.px, center: cs[0] },
+            { p1: biArc.px, p2: biArc.p2, center: cs[1] }
         ]
     } else {
         const [left, right] = split(c, 0.5)

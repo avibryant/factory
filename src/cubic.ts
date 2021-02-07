@@ -72,6 +72,8 @@ function inflections(cu: Cubic): number[] {
     }
 
     return roots
+        .filter(i => i > 0 && i < 1)
+        .sort((a, b) => a - b)
 }
 
 function split(c: Cubic, t: number): [Cubic, Cubic] {
@@ -88,9 +90,20 @@ function split(c: Cubic, t: number): [Cubic, Cubic] {
     ]
 }
 
-
 function splitAtInflections(c: Cubic): Cubic[] {
-    return [c]
+    const inflect = inflections(c)
+    if (inflect.length == 0) {
+        return [c]
+    } else if (inflect.length == 1) {
+        return split(c, inflect[0])
+    } else {
+        const t1 = inflect[0]
+        const t2 = inflect[1]
+        const [left, rest] = split(c, t1)
+        const t3 = (1 - t1) * t2
+        const [center, right] = split(rest, t3)
+        return [left, center, right]
+    }
 }
 
 export { cubic, split, inflections, splitAtInflections, Cubic }
