@@ -93,7 +93,7 @@ class Interpreter {
 
     private cubic(pt: Point, c1: Point, c2: Point) {
         const c = cubic(this.position, pt, c1, c2)
-        const arcs = cubicArcs(c, 1)
+        const arcs = cubicArcs(c, 100)
         const cw = false //TODO
         arcs.forEach(a => this.arc(a.p2, a.center, cw))
     }

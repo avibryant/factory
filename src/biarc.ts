@@ -1,5 +1,5 @@
 import { Point, ptEqual, approxEqual, mul, add, distance } from './point'
-import { Cubic } from './cubic'
+import { Cubic, cubicFn } from './cubic'
 import { Line, line, slope, intersection, perpAt } from './line'
 
 interface BiArc {
@@ -11,7 +11,6 @@ interface BiArc {
 }
 
 function cubicBiArc(c: Cubic): BiArc {
-    console.log(c)
     const c1 = ptEqual(c.p1, c.c1) ? c.c2 : c.c1
     const c2 = ptEqual(c.p2, c.c2) ? c.c1 : c.c2
 
@@ -42,14 +41,11 @@ function cubicBiArc(c: Cubic): BiArc {
     }
 }
 
-function maxDistance(c: Cubic, biArc: BiArc): number {
-    return 0
-}
-
 function center(p0: Point, px: Point, t: Line): Point {
     const mid = mul(add(p0, px), 0.5)
-    const perp = perpAt(mid, px)
-    return intersection(perp, t)
+    const perpMid = perpAt(mid, px)
+    const perpStart = perpAt(p0, t.p2)
+    return intersection(perpStart, perpMid)
 }
 
 function centers(biArc: BiArc): [Point, Point] {
@@ -59,5 +55,5 @@ function centers(biArc: BiArc): [Point, Point] {
     ]
 }
 
-export { BiArc, cubicBiArc, maxDistance, centers }
+export { BiArc, cubicBiArc, centers }
 

@@ -11,6 +11,26 @@ function cubic(p1: Point, p2: Point, c1: Point, c2: Point): Cubic {
     return { p1, p2, c1, c2 }
 }
 
+function cubicFn(c: Cubic, t: number): Point {
+    if (t == 0) {
+        return c.p1
+    } else if (t == 1) {
+        return c.p2
+    }
+
+    const mt = 1 - t
+    const mt2 = mt * mt
+    const t2 = t * t
+
+    // (1 - t)^3 * p1 + 3t(1 - t)^2 * c1 + 3(1 - t)t^2 * c2 + t^3 * p2
+    const a1 = mul(c.p1, mt2 * mt)
+    const a2 = mul(c.c1, 3 * mt2 * t)
+    const a3 = mul(c.c2, 3 * mt * t2)
+    const a4 = mul(c.p2, t2 * t)
+
+    return add(a1, add(a2, add(a3, a4)))
+}
+
 function transform(c: Cubic, fn: (pt: Point) => Point) {
     return {
         p1: fn(c.p1),
@@ -77,16 +97,16 @@ function inflections(cu: Cubic): number[] {
 }
 
 function split(c: Cubic, t: number): [Cubic, Cubic] {
-    const p0 = lerp(this.p1, this.c1, t)
-    const p1 = lerp(this.c1, this.c2, t)
-    const p2 = lerp(this.c2, this.p2, t)
+    const p0 = lerp(c.p1, c.c1, t)
+    const p1 = lerp(c.c1, c.c2, t)
+    const p2 = lerp(c.c2, c.p2, t)
     const p01 = lerp(p0, p1, t)
     const p12 = lerp(p1, p2, t)
     const dp = lerp(p01, p12, t)
 
     return [
-        { p1: this.p1, c1: p0, c2: p01, p2: dp },
-        { p1: dp, c1: p12, c2: p2, p2: this.p2 }
+        { p1: c.p1, c1: p0, c2: p01, p2: dp },
+        { p1: dp, c1: p12, c2: p2, p2: c.p2 }
     ]
 }
 
@@ -106,4 +126,4 @@ function splitAtInflections(c: Cubic): Cubic[] {
     }
 }
 
-export { cubic, split, inflections, splitAtInflections, Cubic }
+export { cubic, cubicFn, split, inflections, splitAtInflections, Cubic }

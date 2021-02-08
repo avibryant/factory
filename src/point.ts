@@ -42,12 +42,11 @@ function rotate(pt: Point, c: Point, rad: number): Point {
 }
 
 function approxEqual(a: number, b: number): boolean {
-    return Math.abs(a - b) < 1e-7
+    return Math.abs(a - b) < 1e-3
 }
 
 function ptEqual(a: Point, b: Point): boolean {
-    return approxEqual(a.x, b.x) &&
-        approxEqual(a.y, b.y)
+    return distance(a, b) < 0.1
 }
 
 function distance(a: Point, b: Point): number {
@@ -56,4 +55,8 @@ function distance(a: Point, b: Point): number {
     return Math.sqrt(dx * dx + dy * dy)
 }
 
-export { Point, lerp, add, sub, mul, cross, rotate, ptEqual, approxEqual, distance }
+function dot(pt1: Point, pt2: Point): number {
+    return pt1.x * pt2.x + pt1.y * pt2.y
+}
+
+export { Point, lerp, add, sub, mul, cross, dot, rotate, ptEqual, approxEqual, distance }
