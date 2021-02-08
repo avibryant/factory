@@ -22,7 +22,7 @@ function z(z: number): GCode {
 }
 
 function arc(x: number, y: number, r: number, cw: boolean): GCode {
-    return { x, y, r, sym: cw ? "G2" : "G3" }
+    return { x, y, r, sym: cw ? "G3" : "G2" }
 }
 
 function spindle(on: boolean): GCode {

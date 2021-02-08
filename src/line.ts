@@ -47,10 +47,8 @@ function collinearIntersection(
     l2: Line
 ): Point {
     for (let i = 0; i < 2; i++) {
-        console.log(i)
         let tp = lerp(l1.p1, l1.p2, i)
         let tb = nearestPoint(l2, tp)
-        console.log(tb)
         if (tb <= 0) {
             let s = nearestPoint(l1, l2.p1)
             if (s >= 0 && s <= 1) {

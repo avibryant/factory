@@ -1,11 +1,12 @@
 import { Cubic, cubicFn, split, splitAtInflections } from './cubic'
 import { Point, distance, sub } from './point'
-import { cubicBiArc, centers } from './biarc'
+import { cubicBiArc, centers, clockwise } from './biarc'
 
 interface Arc {
     p1: Point
     p2: Point
     center: Point
+    cw: boolean
 }
 
 function radius(a: Arc): number {
@@ -23,7 +24,10 @@ function endAngle(a: Arc): number {
 }
 
 function sweepAngle(a: Arc): number {
-    return endAngle(a) - startAngle(a)
+    const sw = endAngle(a) - startAngle(a)
+    if (a.cw && sw < 0) return 2 * Math.PI + sw
+    if (!a.cw && sw > 0) return sw - 2 * Math.PI
+    return sw
 }
 
 function length(a: Arc): number {
@@ -68,14 +72,14 @@ function maxDistance(c: Cubic, a1: Arc, a2: Arc): number {
 function findCubicArcs(c: Cubic, tolerance: number): Arc[] {
     const biArc = cubicBiArc(c)
     const cs = centers(biArc)
+    const cw = clockwise(biArc)
     const arcs = [
-        { p1: biArc.p1, p2: biArc.px, center: cs[0] },
-        { p1: biArc.px, p2: biArc.p2, center: cs[1] }
+        { p1: biArc.p1, p2: biArc.px, center: cs[0], cw },
+        { p1: biArc.px, p2: biArc.p2, center: cs[1], cw }
     ]
     if (maxDistance(c, arcs[0], arcs[1]) < tolerance) {
         return arcs
     } else {
-        console.log("split and recurse")
         const [left, right] = split(c, 0.5)
         const leftArcs = findCubicArcs(left, tolerance)
         const rightArcs = findCubicArcs(right, tolerance)
@@ -84,9 +88,7 @@ function findCubicArcs(c: Cubic, tolerance: number): Arc[] {
 }
 
 function cubicArcs(c: Cubic, tolerance: number): Arc[] {
-    console.log("new cubic")
     return splitAtInflections(c).flatMap((cc) => {
-        console.log("inflection")
         return findCubicArcs(cc, tolerance)
     })
 }

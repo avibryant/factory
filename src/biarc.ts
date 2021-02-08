@@ -55,5 +55,12 @@ function centers(biArc: BiArc): [Point, Point] {
     ]
 }
 
-export { BiArc, cubicBiArc, centers }
+function clockwise(biArc: BiArc): boolean {
+    const a1 = (biArc.px.x - biArc.p1.x) * (biArc.px.y + biArc.p1.y)
+    const a2 = (biArc.p2.x - biArc.px.x) * (biArc.p2.y + biArc.px.y)
+    const a3 = (biArc.p1.x - biArc.p2.x) * (biArc.p1.y + biArc.p2.y)
+    return (a1 + a2 + a3) < 0
+}
+
+export { BiArc, cubicBiArc, centers, clockwise }
 
