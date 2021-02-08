@@ -56,17 +56,18 @@ class Interpreter {
         })
     }
 
-    private relative(pair: number[]): Point {
+    private absolute(pair: number[]): Point {
         return {
-            x: pair[0] + this.position.x,
-            y: pair[1] + this.position.y
+            x: pair[0] / 72,
+            y: pair[1] / -72
         }
     }
 
-    private absolute(pair: number[]): Point {
+    private relative(pair: number[]): Point {
+        const delta = this.absolute(pair)
         return {
-            x: pair[0],
-            y: pair[1]
+            x: delta.x + this.position.x,
+            y: delta.y + this.position.y
         }
     }
 
@@ -93,7 +94,7 @@ class Interpreter {
 
     private cubic(pt: Point, c1: Point, c2: Point) {
         const c = cubic(this.position, pt, c1, c2)
-        const arcs = cubicArcs(c, 100)
+        const arcs = cubicArcs(c, 1)
         arcs.forEach(a => this.arc(a.p2, a.center, a.cw))
     }
 }

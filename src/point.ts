@@ -46,7 +46,7 @@ function approxEqual(a: number, b: number): boolean {
 }
 
 function ptEqual(a: Point, b: Point): boolean {
-    return distance(a, b) < 0.1
+    return distance(a, b) < 0.01
 }
 
 function distance(a: Point, b: Point): number {
