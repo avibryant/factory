@@ -1,8 +1,8 @@
 import { parse } from './svgd.js'
-import { GCode, line, goTo, format, arc } from './gcode'
-import { Point, distance } from './point'
-import { Arc, cubicArcs } from './arc'
-import { Cubic, cubic } from './cubic'
+import { GCode, line, goTo, arc } from '../gcode/gcode'
+import { Point, distance } from '../geom/point'
+import { cubic } from './cubic'
+import { cubicArcs } from './biarc'
 
 type CommandName =
     "z" | "Z" | "h" | "H" | "v" | "V" |
@@ -99,11 +99,11 @@ class Interpreter {
     }
 }
 
-function convert(path: string): string {
+function convert(path: string): GCode[] {
     const commands = <Command[]>parse(path)
     const interp = new Interpreter()
     commands.forEach(cmd => interp.run(cmd))
-    return interp.gcodes.map(gc => format(gc)).join("\n")
+    return interp.gcodes
 }
 
 export { convert }

@@ -1,4 +1,4 @@
-import { Point, lerp, sub, mul, add } from './point'
+import { Point, lerp, sub, mul, add } from '../geom/point'
 
 interface Cubic {
     p1: Point
