@@ -1,12 +1,13 @@
 import { Point, sub, cross, lerp, rotate, ptEqual, dot, distance } from './point'
 
 interface Line {
+    type: "line"
     p1: Point
     p2: Point
 }
 
 function line(p1: Point, p2: Point): Line {
-    return { p1, p2 }
+    return { type: "line", p1, p2 }
 }
 
 function slope(l: Line): number {
@@ -15,7 +16,7 @@ function slope(l: Line): number {
 
 function perpAt(p1: Point, p2: Point): Line {
     const p3 = rotate(p2, p1, Math.PI / 2)
-    return { p1: p1, p2: p3 }
+    return line(p1, p3)
 }
 
 

@@ -1,6 +1,7 @@
 import { Point, distance, sub } from './point'
 
 interface Arc {
+    type: "arc"
     p1: Point
     p2: Point
     center: Point
@@ -41,4 +42,8 @@ function arcFn(a: Arc, t: number): Point {
     return { x, y }
 }
 
-export { Arc, arcLength, arcFn }
+function arc(p1: Point, p2: Point, center: Point, cw: boolean): Arc {
+    return { type: "arc", p1, p2, center, cw }
+}
+
+export { Arc, arcLength, arcFn, arc }

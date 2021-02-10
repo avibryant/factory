@@ -1,3 +1,5 @@
+import { Path, Segment } from '../geom/path'
+import { Point, distance } from '../geom/point'
 
 type GSym = "G0" | "G1" | "G2" | "G3" | "M3" | "M5"
 
@@ -9,20 +11,20 @@ interface GCode {
     r?: number
 }
 
-function goTo(x: number, y: number): GCode {
-    return { x, y, sym: "G0" }
+function goTo(pt: Point): GCode {
+    return { x: pt.x, y: pt.y, sym: "G0" }
 }
 
-function line(x: number, y: number): GCode {
-    return { x, y, sym: "G1" }
+function line(pt: Point): GCode {
+    return { x: pt.x, y: pt.y, sym: "G1" }
 }
 
 function z(z: number): GCode {
     return { z, sym: "G0" }
 }
 
-function arc(x: number, y: number, r: number, cw: boolean): GCode {
-    return { x, y, r, sym: cw ? "G3" : "G2" }
+function arc(pt: Point, r: number, cw: boolean): GCode {
+    return { x: pt.x, y: pt.y, r, sym: cw ? "G3" : "G2" }
 }
 
 function spindle(on: boolean): GCode {
@@ -55,7 +57,25 @@ function format(gc: GCode): string {
     return parts.join(" ")
 }
 
+function segment(s: Segment): GCode {
+    if (s.type == "line") {
+        return line(s.p2)
+    } else {
+        return arc(s.p2, distance(s.center, s.p2), s.cw)
+    }
+}
+
+function path(p: Path): GCode[] {
+    const gcode = []
+    gcode.push(goTo(p.segments[0].p1))
+    p.segments.forEach(s => gcode.push(segment(s)))
+    if (p.closed) {
+        gcode.push(line(p.segments[0].p1))
+    }
+    return gcode
+}
+
 export {
     GCode, format,
-    spindle, arc, z, line, goTo,
+    spindle, arc, z, line, goTo, path
 }

@@ -1,8 +1,10 @@
 import { parse } from './svgd.js'
-import { GCode, line, goTo, arc } from '../gcode/gcode'
+import { Path, Segment } from '../geom/path'
+import { line } from '../geom/line'
 import { Point, distance } from '../geom/point'
 import { cubic } from './cubic'
 import { cubicArcs } from './biarc'
+import { arc } from '../geom/arc'
 
 type CommandName =
     "z" | "Z" | "h" | "H" | "v" | "V" |
@@ -15,7 +17,7 @@ interface Command {
 }
 
 class Interpreter {
-    gcodes: GCode[] = []
+    paths: Path[] = []
     start?: Point
     position?: Point
 
@@ -72,23 +74,32 @@ class Interpreter {
     }
 
     private close() {
-        this.line(this.start)
+        this.position = this.start
+        this.currentPath().closed = true
+        this.paths.push({ segments: [], closed: false })
     }
 
     private move(pt: Point) {
-        this.gcodes.push(goTo(pt.x, pt.y))
         this.position = pt
-        if (!this.start)
-            this.start = pt
+        this.start = pt
+        this.paths.push({ segments: [], closed: false })
+    }
+
+    private currentPath() {
+        return this.paths[this.paths.length - 1]
+    }
+
+    private currentSegments() {
+        return this.currentPath().segments
     }
 
     private line(pt: Point) {
-        this.gcodes.push(line(pt.x, pt.y))
+        this.currentSegments().push(line(this.position, pt))
         this.position = pt
     }
 
     private arc(pt: Point, center: Point, cw: boolean) {
-        this.gcodes.push(arc(pt.x, pt.y, distance(pt, center), cw))
+        this.currentSegments().push(arc(this.position, pt, center, cw))
         this.position = pt
     }
 
@@ -99,11 +110,11 @@ class Interpreter {
     }
 }
 
-function convert(path: string): GCode[] {
+function convert(path: string): Path[] {
     const commands = <Command[]>parse(path)
     const interp = new Interpreter()
     commands.forEach(cmd => interp.run(cmd))
-    return interp.gcodes
+    return interp.paths
 }
 
 export { convert }

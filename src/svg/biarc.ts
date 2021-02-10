@@ -1,6 +1,6 @@
 import { Point, ptEqual, approxEqual, mul, add, distance } from '../geom/point'
 import { Line, line, slope, intersection, perpAt } from '../geom/line'
-import { Arc, arcFn, arcLength } from '../geom/arc'
+import { Arc, arcFn, arcLength, arc } from '../geom/arc'
 import { Cubic, cubicFn, split, splitAtInflections } from './cubic'
 
 interface BiArc {
@@ -95,8 +95,8 @@ function findCubicArcs(c: Cubic, tolerance: number): Arc[] {
     const cs = centers(biArc)
     const cw = clockwise(biArc)
     const arcs = [
-        { p1: biArc.p1, p2: biArc.px, center: cs[0], cw },
-        { p1: biArc.px, p2: biArc.p2, center: cs[1], cw }
+        arc(biArc.p1, biArc.px, cs[0], cw),
+        arc(biArc.px, biArc.p2, cs[1], cw)
     ]
     if (maxDistance(c, arcs[0], arcs[1]) < tolerance) {
         return arcs
