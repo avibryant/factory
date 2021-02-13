@@ -118,7 +118,7 @@ function fromSVG(path: string): Path[] {
 }
 
 function formatPt(pt: Point): string {
-    return pt.x + " " + pt.y
+    return pt.x * 72 + " " + pt.y * 72
 }
 
 function format(segment: Segment): string {
