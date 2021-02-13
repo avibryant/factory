@@ -46,4 +46,4 @@ function arc(p1: Point, p2: Point, center: Point, cw: boolean): Arc {
     return { type: "arc", p1, p2, center, cw }
 }
 
-export { Arc, arcLength, arcFn, arc }
+export { Arc, arcLength, arcFn, arc, sweepAngle }

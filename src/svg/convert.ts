@@ -4,7 +4,7 @@ import { line } from '../geom/line'
 import { Point, distance } from '../geom/point'
 import { cubic } from './cubic'
 import { cubicArcs } from './biarc'
-import { arc } from '../geom/arc'
+import { arc, sweepAngle } from '../geom/arc'
 
 type CommandName =
     "z" | "Z" | "h" | "H" | "v" | "V" |
@@ -110,11 +110,33 @@ class Interpreter {
     }
 }
 
-function convert(path: string): Path[] {
+function fromSVG(path: string): Path[] {
     const commands = <Command[]>parse(path)
     const interp = new Interpreter()
     commands.forEach(cmd => interp.run(cmd))
     return interp.paths
 }
 
-export { convert }
+function formatPt(pt: Point): string {
+    return pt.x + " " + pt.y
+}
+
+function format(segment: Segment): string {
+    if (segment.type == "line") {
+        return "L " + formatPt(segment.p2)
+    } else {
+        const r = distance(segment.p1, segment.center)
+        const a = sweepAngle(segment)
+        return ["A", r, r, a, 1, segment.cw ? 0 : 1, formatPt(segment.p2)].join(" ")
+    }
+}
+
+function toSVG(path: Path): string {
+    const segments = path.segments.map(s => format(s))
+    if (path.closed)
+        segments.push("Z")
+    segments.unshift("M " + formatPt(path.segments[0].p1))
+    return segments.join(" ")
+}
+
+export { fromSVG, toSVG }
