@@ -126,8 +126,8 @@ function format(segment: Segment): string {
         return "L " + formatPt(segment.p2)
     } else {
         const r = distance(segment.p1, segment.center)
-        const a = sweepAngle(segment)
-        return ["A", r, r, a, 1, segment.cw ? 0 : 1, formatPt(segment.p2)].join(" ")
+        const large = Math.abs(sweepAngle(segment)) > Math.PI
+        return ["A", r, r, 0, large ? 1 : 0, segment.cw ? 1 : 0, formatPt(segment.p2)].join(" ")
     }
 }
 
