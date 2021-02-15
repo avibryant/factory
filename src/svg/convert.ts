@@ -1,5 +1,6 @@
 import { parse } from './svgd.js'
 import { Path, Segment } from '../geom/path'
+import { Shape } from '../geom/shape'
 import { line } from '../geom/line'
 import { Point, distance } from '../geom/point'
 import { cubic } from './cubic'
@@ -110,33 +111,37 @@ class Interpreter {
     }
 }
 
-function fromSVG(path: string): Path[] {
+function fromSVG(path: string): Shape {
     const commands = <Command[]>parse(path)
     const interp = new Interpreter()
     commands.forEach(cmd => interp.run(cmd))
-    return interp.paths
+    return { paths: interp.paths }
 }
 
 function formatPt(pt: Point): string {
-    return pt.x * 72 + " " + pt.y * 72
+    return pt.x * 72 + " " + pt.y * -72
 }
 
 function format(segment: Segment): string {
     if (segment.type == "line") {
         return "L " + formatPt(segment.p2)
     } else {
-        const r = distance(segment.p1, segment.center)
+        const r = distance(segment.p1, segment.center) * 72
         const large = Math.abs(sweepAngle(segment)) > Math.PI
-        return ["A", r, r, 0, large ? 1 : 0, segment.cw ? 1 : 0, formatPt(segment.p2)].join(" ")
+        return ["A", r, r, 0, large ? 1 : 0, segment.cw ? 0 : 1, formatPt(segment.p2)].join(" ")
     }
 }
 
-function toSVG(path: Path): string {
+function pathSVG(path: Path): string {
     const segments = path.segments.map(s => format(s))
     if (path.closed)
         segments.push("Z")
     segments.unshift("M " + formatPt(path.segments[0].p1))
     return segments.join(" ")
+}
+
+function toSVG(shape: Shape): string {
+    return shape.paths.map(p => pathSVG(p)).join(" ")
 }
 
 export { fromSVG, toSVG }
