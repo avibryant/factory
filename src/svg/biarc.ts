@@ -1,6 +1,7 @@
 import { Point, ptEqual, approxEqual, mul, add, distance } from '../geom/point'
 import { Line, line, slope, intersection, perpAt } from '../geom/line'
 import { Arc, arcFn, arcLength, arc } from '../geom/arc'
+import { Segment } from '../geom/path'
 import { Cubic, cubicFn, split, splitAtInflections } from './cubic'
 
 interface BiArc {
@@ -19,7 +20,7 @@ function cubicBiArc(c: Cubic): BiArc {
     const t2 = line(c.p2, c2)
 
     if (approxEqual(slope(t1), slope(t2))) {
-        return null //todo
+        return null
     }
 
     const v = intersection(t1, t2)
@@ -90,25 +91,30 @@ function maxDistance(c: Cubic, a1: Arc, a2: Arc): number {
     return max
 }
 
-function findCubicArcs(c: Cubic, tolerance: number): Arc[] {
-    const biArc = cubicBiArc(c)
-    const cs = centers(biArc)
-    const cw = clockwise(biArc)
-    const arcs = [
-        arc(biArc.p1, biArc.px, cs[0], cw),
-        arc(biArc.px, biArc.p2, cs[1], cw)
-    ]
-    if (maxDistance(c, arcs[0], arcs[1]) < tolerance) {
-        return arcs
-    } else {
-        const [left, right] = split(c, 0.5)
-        const leftArcs = findCubicArcs(left, tolerance)
-        const rightArcs = findCubicArcs(right, tolerance)
-        return leftArcs.concat(rightArcs)
+function findCubicArcs(c: Cubic, tolerance: number): Segment[] {
+    if (distance(c.p1, c.p2) < 0.01) {
+        return [line(c.p1, c.p2)]
     }
+    const biArc = cubicBiArc(c)
+    if (biArc) {
+        const cs = centers(biArc)
+        const cw = clockwise(biArc)
+        const arcs = [
+            arc(biArc.p1, biArc.px, cs[0], cw),
+            arc(biArc.px, biArc.p2, cs[1], cw)
+        ]
+        if (maxDistance(c, arcs[0], arcs[1]) < tolerance) {
+            return arcs
+        }
+    }
+
+    const [left, right] = split(c, 0.5)
+    const leftArcs = findCubicArcs(left, tolerance)
+    const rightArcs = findCubicArcs(right, tolerance)
+    return leftArcs.concat(rightArcs)
 }
 
-function cubicArcs(c: Cubic, tolerance: number): Arc[] {
+function cubicArcs(c: Cubic, tolerance: number): Segment[] {
     return splitAtInflections(c).flatMap((cc) => {
         return findCubicArcs(cc, tolerance)
     })

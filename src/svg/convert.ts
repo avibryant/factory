@@ -106,8 +106,10 @@ class Interpreter {
 
     private cubic(pt: Point, c1: Point, c2: Point) {
         const c = cubic(this.position, pt, c1, c2)
-        const arcs = cubicArcs(c, 1)
-        arcs.forEach(a => this.arc(a.p2, a.center, a.cw))
+        cubicArcs(c, 1).forEach(s => {
+            this.currentSegments().push(s)
+            this.position = s.p2
+        })
     }
 }
 

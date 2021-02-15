@@ -29,7 +29,9 @@ function intersection(
     let d = cross(av, bv)
 
     if (Math.abs(d) <= 1e-6) {
-        return collinearIntersection(l1, l2)
+        const ci = collinearIntersection(l1, l2)
+        if (ci)
+            return ci
     }
 
     let asb = sub(l1.p1, l2.p1)

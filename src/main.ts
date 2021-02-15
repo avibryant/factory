@@ -8,7 +8,12 @@ import * as fs from 'fs'
 function findShapes(svg: any): Shape[] {
     const results: Shape[] = []
     if (svg.path) {
-        results.push(...svg.path.map(g => fromSVG(g.$.d)))
+        svg.path.forEach(g => {
+            const d = g.$.d
+            if (d && d.length > 0) {
+                results.push(fromSVG(d))
+            }
+        })
     }
     if (svg.g) {
         results.push(...svg.g.flatMap(g => findShapes(g)))
@@ -41,3 +46,4 @@ xml.parseString(input, (err, res) => {
     console.log(x)
     //    shapes.forEach(s => s.paths.forEach(p => path(p).forEach(g => console.log(format(g)))))
 })
+
